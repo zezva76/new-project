@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ელექტრო Project Planner – PUE სტანდარტი</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    margin:0; 
+    padding:20px; 
+    min-height:100vh; 
+}
+.container { 
+    max-width: 1400px; 
+    margin: 0 auto; 
+    display: grid;
+    grid-template-columns: 260px 1fr 300px;
+    gap: 20px;
+}
+.main-content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+h2 { 
+    text-align:center; 
+    color:#2c3e50; 
+    margin-bottom:10px; 
+    font-size:28px; 
+}
+.subtitle { 
+    text-align:center; 
+    color:#7f8c8d; 
+    margin-bottom:30px; 
+    font-size:14px; 
+}
+label { 
+    font-weight:600; 
+    display:block; 
+    margin-top:12px; 
+    color:#34495e; 
+    font-size:13px; 
+}
+input, select, button { 
+    width:100%; 
+    padding:12px; 
+    margin:6px 0; 
+    border-radius:8px; 
+    border:2px solid #e0e0e0; 
+    box-sizing:border-box; 
+    font-size:14px; 
+    transition:all 0.3s; 
+}
+input:focus, select:focus { 
+    border-color:#3498db; 
+    outline:none; 
+    box-shadow:0 0 0 3px rgba(52,152,219,0.1); 
+}
+button { 
+    background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    color:white; 
+    font-size:16px; 
+    font-weight:600; 
+    cursor:pointer; 
+    border:none; 
+    margin-top:15px; 
+    border-radius:8px; 
+}
+button:hover { 
+    transform:translateY(-2px); 
+    box-shadow:0 5px 20px rgba(0,0,0,0.2); 
+}
+button:active { 
+    transform:translateY(0); 
+}
+.segment { 
+    border:2px solid #ecf0f1; 
+    padding:20px; 
+    border-radius:12px; 
+    margin-bottom:20px; 
+    background:#fafafa; 
+    position:relative; 
+}
+.segment h3 { 
+    margin-top:0; 
+    color:#2c3e50; 
+    font-size:16px; 
+    border-bottom:2px solid #3498db; 
+    padding-bottom:8px; 
+    display:inline-block; 
+}
+.remove-btn { 
+    position:absolute; 
+    top:15px; 
+    right:15px; 
+    background:#e74c3c; 
+    color:white; 
+    border:none; 
+    padding:5px 12px; 
+    border-radius:6px; 
+    cursor:pointer; 
+    font-size:12px; 
+    width:auto; 
+}
+.remove-btn:hover { 
+    background:#c0392b; 
+}
+.result { 
+    margin-top:25px; 
+    padding:20px; 
+    background:#f8f9fa; 
+    border-radius:12px; 
+    border-left:4px solid #3498db; 
+}
+.result h3 { 
+    color:#2c3e50; 
+    margin-top:0; 
+}
+.result-item { 
+    padding:8px 0; 
+    border-bottom:1px dashed #bdc3c7; 
+}
+.result-item:last-child { 
+    border-bottom:none; 
+}
+canvas { 
+    margin-top:25px; 
+    background:#fff; 
+    border:2px solid #ecf0f1; 
+    border-radius:12px; 
+    box-shadow:0 4px 15px rgba(0,0,0,0.05); 
+}
+.tooltip { 
+    position:absolute; 
+    background:rgba(44,62,80,0.95); 
+    color:#fff; 
+    padding:10px 15px; 
+    border-radius:8px; 
+    pointer-events:none; 
+    font-size:13px; 
+    display:none; 
+    z-index:100; 
+    box-shadow:0 4px 15px rgba(0,0,0,0.3); 
+    line-height:1.6; 
+}
+.warning { 
+    color:#e74c3c; 
+    font-weight:600; 
+}
+.success { 
+    color:#27ae60; 
+    font-weight:600; 
+}
+.info-box { 
+    background:#e8f4f8; 
+    border-left:4px solid #3498db; 
+    padding:15px; 
+    margin:15px 0; 
+    border-radius:6px; 
+    font-size:13px; 
+}
+.danger-box { 
+    background:#fdf2f2; 
+    border-left:4px solid #e74c3c; 
+    padding:15px; 
+    margin:15px 0; 
+    border-radius:6px; 
+    font-size:13px; 
+}
+
+/* მარცხენა საიდბარი - კაბელები */
+.sidebar-left {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+.sidebar-left h3 {
+    color: #2c3e50;
+    font-size: 16px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #27ae60;
+}
+.cable-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #27ae60;
+    transition: transform 0.2s;
+}
+.cable-item:hover {
+    transform: translateX(5px);
+    background: #e8f5e9;
+}
+.cable-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    margin-right: 12px;
+}
+.cable-info {
+    flex: 1;
+}
+.cable-size {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 14px;
+}
+.cable-amp {
+    color: #27ae60;
+    font-size: 12px;
+    font-weight: 600;
+}
+.cable-use {
+    color: #7f8c8d;
+    font-size: 11px;
+}
+
+/* მარჯვენა საიდბარი - ავტომატები და სტარტები */
+.sidebar-right {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+.sidebar-right h3 {
+    color: #2c3e50;
+    font-size: 16px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #e74c3c;
+}
+.breaker-section {
+    margin-bottom: 20px;
+}
+.breaker-title {
+    background: #3498db;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.breaker-title:hover {
+    background: #2980b9;
+}
+.breaker-title.c-type {
+    background: #e67e22;
+}
+.breaker-title.c-type:hover {
+    background: #d35400;
+}
+.breaker-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.breaker-item {
+    background: #ecf0f1;
+    padding: 6px 8px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 12px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+.breaker-item.b-type {
+    border-left: 3px solid #3498db;
+}
+.breaker-item.c-type {
+    border-left: 3px solid #e67e22;
+}
+
+/* სტარტების სექცია */
+.start-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px dashed #bdc3c7;
+}
+.start-title {
+    color: #e74c3c;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+.start-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 6px;
+    background: #fdf2f2;
+    border-radius: 6px;
+    border-left: 3px solid #e74c3c;
+}
+.start-icon {
+    width: 30px;
+    height: 30px;
+    background: #e74c3c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    margin-right: 10px;
+}
+.start-info {
+    flex: 1;
+}
+.start-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 12px;
+}
+.start-value {
+    color: #e74c3c;
+    font-size: 11px;
+    font-weight: 600;
+}
+.start-coef {
+    color: #7f8c8d;
+    font-size: 10px;
+}
+
+/* კოეფიციენტების ცხრილი */
+.coef-section {
+    margin-top: 15px;
+    padding: 12px;
+    background: #e8f4f8;
+    border-radius: 8px;
+}
+.coef-title {
+    color: #2980b9;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.coef-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 11px;
+    border-bottom: 1px dashed #bdc3c7;
+}
+.coef-item:last-child {
+    border-bottom: none;
+}
+
+/* მობილური */
+@media only screen and (max-width: 1200px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+    .sidebar-left, .sidebar-right {
+        position: static;
+        order: 2;
+    }
+    .main-content {
+        order: 1;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .container { padding: 10px; }
+    input, select, button { font-size: 14px; padding: 10px; }
+    canvas { width: 100% !important; height: 300px !important; }
+    .segment h3 { font-size: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- მარცხენა საიდბარი - კაბელები -->
+    <aside class="sidebar-left">
+        <h3>🔌 კაბელები (სპილენძი)</h3>
+        
+        <div class="cable-item">
+            <div class="cable-icon">1.5</div>
+            <div class="cable-info">
+                <div class="cable-size">1.5 mm²</div>
+                <div class="cable-amp">მაქს: 19A</div>
+                <div class="cable-use">განათება</div>
+            </div>
+        </div>
+        
+        <div class="cable-item">
+            <div class="cable-icon">2.5</div>
+            <div class="cable-info">
+                <div class="cable-size">2.5 mm²</div>
+                <div class="cable-amp">მაქს: 27A</div>
+                <div class="cable-use">როზეტები</div>
+            </div>
+        </div>
+        
+        <div class="cable-item">
+            <div class="cable-icon">4</div>
+            <div class="cable-info">
+                <div class="cable-size">4 mm²</div>
+                <div class="cable-amp">მაქს: 36A</div>
+                <div class="cable-use">მაღალი დატვირთვა</div>
+            </div>
+        </div>
+        
+        <div class="cable-item">
+            <div class="cable-icon">6</div>
+            <div class="cable-info">
+                <div class="cable-size">6 mm²</div>
+                <div class="cable-amp">მაქს: 46A</div>
+                <div class="cable-use">შემომავალი</div>
+            </div>
+        </div>
+        
+        <div class="cable-item">
+            <div class="cable-icon">10</div>
+            <div class="cable-info">
+                <div class="cable-size">10 mm²</div>
+                <div class="cable-amp">მაქს: 63A</div>
+                <div class="cable-use">სვარკა</div>
+            </div>
+        </div>
+        
+        <div class="cable-item">
+            <div class="cable-icon">16</div>
+            <div class="cable-info">
+                <div class="cable-size">16 mm²</div>
+                <div class="cable-amp">მაქს: 85A</div>
+                <div class="cable-use">სამფაზიანი</div>
+            </div>
+        </div>
+
+        <div class="coef-section">
+            <div class="coef-title">📐 ფორმულები</div>
+            <div class="coef-item">
+                <span>I = P / U</span>
+                <span>დენი</span>
+            </div>
+            <div class="coef-item">
+                <span>In = I × K</span>
+                <span>ავტომატი</span>
+            </div>
+            <div class="coef-item">
+                <span>ΔU ≤ 3%</span>
+                <span>PUE</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ძირითადი კონტენტი -->
+    <main class="main-content">
+        <h2>⚡ ელექტრო Project Planner</h2>
+        <p class="subtitle">PUE სტანდარტი | B/C ტიპის ავტომატები | სპილენძის კაბელი</p>
+
+        <div class="info-box">
+        <strong>💡 მნიშვნელოვანი:</strong><br>
+        • ავტომატი იცავს კაბელს, არა მოწყობილობას!<br>
+        • B ტიპი (3-5×In) - საცხოვრებელი, C ტიპი (5-10×In) - სამრეწველო<br>
+        • კაბელი: 1.5mm² (განათება), 2.5mm² (როზეტები), 4mm²+ (მაღალი დატვირთვა)
+        <button onclick="window.location.href='prof-electro/home.html'">ფორმულები</button>
+        </div>
+
+        <div id="segmentsContainer"></div>
+        <button onclick="addSegment()">➕ სეგმენტის დამატება</button>
+        <button onclick="calculate()">🔧 გამოთვლა და შემოწმება</button>
+
+        <div class="result" id="result"></div>
+        <canvas id="chart" width="900" height="400"></canvas>
+        <div class="tooltip" id="tooltip"></div>
+    </main>
+
+    <!-- მარჯვენა საიდბარი - ავტომატები და სტარტები -->
+    <aside class="sidebar-right">
+        <h3>🔧 ავტომატები</h3>
+        
+        <div class="breaker-section">
+            <div class="breaker-title" onclick="toggleBreaker('b-breakers')">
+                B ტიპი (საცხოვრებელი)
+                <span style="font-size: 10px; opacity: 0.8;">3-5×In</span>
+            </div>
+            <div id="b-breakers" class="breaker-list">
+                <div class="breaker-item b-type">B6</div>
+                <div class="breaker-item b-type">B10</div>
+                <div class="breaker-item b-type">B16</div>
+                <div class="breaker-item b-type">B20</div>
+                <div class="breaker-item b-type">B32</div>
+                <div class="breaker-item b-type">B40</div>
+                <div class="breaker-item b-type">B50</div>
+                <div class="breaker-item b-type">B63</div>
+            </div>
+        </div>
+        
+        <div class="breaker-section">
+            <div class="breaker-title c-type" onclick="toggleBreaker('c-breakers')">
+                C ტიპი (სამრეწველო)
+                <span style="font-size: 10px; opacity: 0.8;">5-10×In</span>
+            </div>
+            <div id="c-breakers" class="breaker-list">
+                <div class="breaker-item c-type">C6</div>
+                <div class="breaker-item c-type">C10</div>
+                <div class="breaker-item c-type">C16</div>
+                <div class="breaker-item c-type">C20</div>
+                <div class="breaker-item c-type">C32</div>
+                <div class="breaker-item c-type">C40</div>
+                <div class="breaker-item c-type">C50</div>
+                <div class="breaker-item c-type">C63</div>
+            </div>
+        </div>
+
+        <div class="start-section">
+            <div class="start-title">⚡ სტარტული დენები</div>
+            
+            <div class="start-item">
+                <div class="start-icon">🔥</div>
+                <div class="start-info">
+                    <div class="start-name">რეზისტორი</div>
+                    <div class="start-value">1× (არ აქვს)</div>
+                    <div class="start-coef">K = 1.25</div>
+                </div>
+            </div>
+            
+            <div class="start-item">
+                <div class="start-icon">🔄</div>
+                <div class="start-info">
+                    <div class="start-name">მატორი</div>
+                    <div class="start-value">5-7×</div>
+                    <div class="start-coef">K = 1.5-2.0</div>
+                </div>
+            </div>
+            
+            <div class="start-item">
+                <div class="start-icon">⚡</div>
+                <div class="start-info">
+                    <div class="start-name">ტრანსფორმატორი</div>
+                    <div class="start-value">3-15×</div>
+                    <div class="start-coef">K = 1.5-2.5</div>
+                </div>
+            </div>
+
+            <div class="coef-section" style="background: #fff3e0; margin-top: 15px;">
+                <div class="coef-title" style="color: #e67e22;">📋 მაგალითები</div>
+                <div class="coef-item">
+                    <span>ჩაიდანი</span>
+                    <span>1.25×</span>
+                </div>
+                <div class="coef-item">
+                    <span>კომპრესორი</span>
+                    <span>1.5×</span>
+                </div>
+                <div class="coef-item">
+                    <span>სვარკა</span>
+                    <span>2.0-2.5×</span>
+                </div>
+                <div class="coef-item">
+                    <span>მიკროტალღური</span>
+                    <span>1.5×</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="coef-section" style="margin-top: 15px; background: #e8f5e9;">
+            <div class="coef-title" style="color: #27ae60;">✅ წესი</div>
+            <div style="font-size: 11px; color: #2c3e50; line-height: 1.5;">
+                <strong>ავტომატი ≤ კაბელი</strong><br>
+                In × 1.25...2.5 ≤ I_max(კაბელი)
+            </div>
+        </div>
+    </aside>
+</div>
+
+<script>
+let segmentCount = 0;
+const segments = [];
+
+// PUE სტანდარტული მნიშვნელობები
+const STANDARD_BREAKERS = [6, 10, 16, 20, 32, 40, 50, 63];
+const CABLE_SIZES = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50];
+const CABLE_MAX_CURRENT = {
+    1.5: 19, 2.5: 27, 4: 36, 6: 46, 10: 63, 16: 85, 25: 113, 35: 138, 50: 168
+};
+
+function toggleBreaker(id) {
+    const el = document.getElementById(id);
+    if (el.style.display === 'none') {
+        el.style.display = 'grid';
+    } else {
+        el.style.display = 'none';
+    }
+}
+
+function addSegment(){
+    segmentCount++;
+    const container = document.getElementById("segmentsContainer");
+    const div = document.createElement("div");
+    div.className = "segment";
+    div.id = "segment"+segmentCount;
+    div.innerHTML = `
+        <button class="remove-btn" onclick="removeSegment(${segmentCount})">✕</button>
+        <h3>📍 სეგმენტი ${segmentCount}</h3>
+        
+        <label>დანიშნულება</label>
+        <select class="purpose" onchange="autoSelectBreaker(${segmentCount})">
+            <option value="lighting">💡 განათება</option>
+            <option value="socket">🔌 როზეტები</option>
+            <option value="conditioner">❄️ კონდიციონერი</option>
+            <option value="heater">🔥 გამათბობელი/გამაცხელებელი</option>
+            <option value="kitchen">🍳 სამზარეულო (ჩაიდანი, გაზქურა)</option>
+            <option value="welding">⚡ სვარკა/კომპრესორი</option>
+            <option value="other">🔧 სხვა</option>
+        </select>
+
+        <label>ფაზა</label>
+        <select class="phase">
+            <option value="single">ერთფაზიანი 220V</option>
+            <option value="three">სამფაზიანი 380V</option>
+        </select>
+
+        <label>სიმძლავრე P (W)</label>
+        <input type="number" class="power" placeholder="მაგ: 2200" onchange="autoSelectBreaker(${segmentCount})">
+
+        <label>კაბელის სიგრძე L (მ)</label>
+        <input type="number" class="length" placeholder="მაგ: 25">
+
+        <label>ავტომატის ტიპი</label>
+        <select class="breakerType">
+            <option value="B" selected>B ტიპი (საცხოვრებელი)</option>
+            <option value="C">C ტიპი (სამრეწველო/ძრავები)</option>
+            <option value="D">D ტიპი (ტრანსფორმატორები)</option>
+        </select>
+
+        <label>ავტომატის ამპერი (სტანდარტული)</label>
+        <select class="breakerAmp">
+            ${STANDARD_BREAKERS.map(a => `<option value="${a}">${a}A</option>`).join('')}
+        </select>
+
+        <label>კაბელის კვეთა (mm²)</label>
+        <select class="cableSize">
+            ${CABLE_SIZES.map(s => `<option value="${s}">${s} mm²</option>`).join('')}
+        </select>
+
+        <div class="auto-recommend" id="rec${segmentCount}" style="margin-top:10px; padding:10px; background:#e8f5e9; border-radius:6px; font-size:12px; display:none;"></div>
+    `;
+    container.appendChild(div);
+    segments.push(div);
+}
+
+function removeSegment(id){
+    const el = document.getElementById("segment"+id);
+    if(el){
+        el.remove();
+        const idx = segments.findIndex(s => s.id === "segment"+id);
+        if(idx > -1) segments.splice(idx, 1);
+    }
+}
+
+function autoSelectBreaker(id){
+    const seg = document.getElementById("segment"+id);
+    const P = parseFloat(seg.querySelector(".power").value) || 0;
+    const phase = seg.querySelector(".phase").value;
+    const purpose = seg.querySelector(".purpose").value;
+    
+    if(P === 0) return;
+    
+    const voltage = phase === "single" ? 220 : 380;
+    const I = phase === "single" ? P / voltage : P / (Math.sqrt(3) * voltage);
+    
+    let K = 1.25;
+    if(purpose === "welding" || purpose === "conditioner") K = 1.5;
+    if(purpose === "kitchen") K = 1.25;
+    
+    const In = I * K;
+    let selectedBreaker = STANDARD_BREAKERS.find(b => b >= In) || 63;
+    
+    let recommendedCable = 1.5;
+    if(purpose === "lighting") recommendedCable = 1.5;
+    else if(purpose === "socket" && P <= 3500) recommendedCable = 2.5;
+    else if(P <= 5500) recommendedCable = 2.5;
+    else if(P <= 7000) recommendedCable = 4;
+    else recommendedCable = 6;
+    
+    seg.querySelector(".breakerAmp").value = selectedBreaker;
+    seg.querySelector(".cableSize").value = recommendedCable;
+    
+    const recDiv = document.getElementById("rec"+id);
+    recDiv.style.display = "block";
+    recDiv.innerHTML = `
+        <strong>🤖 ავტომატური შერჩევა:</strong><br>
+        გამოთვლილი დენი: <b>${I.toFixed(1)}A</b> × ${K} = <b>${In.toFixed(1)}A</b><br>
+        რეკომენდირებული: <b>B${selectedBreaker}</b> + <b>${recommendedCable}mm²</b>
+    `;
+}
+
+function calculate(){
+    const cosphi = 0.95;
+    let resultsHTML = "<h3>📊 შედეგები PUE სტანდარტის მიხედვით</h3>";
+    let chartData = [];
+    let chartLabels = [];
+    let colors = [];
+    let totalCable = 0;
+    let totalBreaker = 0;
+    let hasErrors = false;
+
+    segments.forEach((seg,i)=>{
+        const purpose = seg.querySelector(".purpose").value;
+        const phase = seg.querySelector(".phase").value;
+        const L = parseFloat(seg.querySelector(".length").value) || 0;
+        const breakerAmp = parseFloat(seg.querySelector(".breakerAmp").value);
+        const breakerType = seg.querySelector(".breakerType").value;
+        const cableSize = parseFloat(seg.querySelector(".cableSize").value);
+        const P = parseFloat(seg.querySelector(".power").value) || 0;
+        
+        if(!L || !P) return;
+
+        const voltage = phase === "single" ? 220 : 380;
+        let I = phase === "single" ? P/(voltage*cosphi) : P/(Math.sqrt(3)*voltage*cosphi);
+        I = parseFloat(I.toFixed(2));
+        
+        const rho = 0.0175;
+        const R = rho * L / cableSize;
+        const deltaU = 2 * I * R;
+        const percent = parseFloat((deltaU/voltage*100).toFixed(2));
+        
+        const Pheat = I*I*R;
+        
+        const cableMaxCurrent = CABLE_MAX_CURRENT[cableSize];
+        const cableSafe = I <= cableMaxCurrent;
+        const breakerSafe = I <= breakerAmp;
+        const voltageDropSafe = percent <= 3;
+        
+        const breakerProtectsCable = breakerAmp <= cableMaxCurrent;
+        
+        let recommendations = [];
+        let statusClass = "success";
+        
+        if(!cableSafe){
+            recommendations.push(`❌ კაბელი ${cableSize}mm² არ იტანს ${I}A-ს! (მაქს: ${cableMaxCurrent}A)`);
+            statusClass = "warning";
+            hasErrors = true;
+        }
+        
+        if(!breakerSafe){
+            recommendations.push(`❌ ავტომატი ${breakerType}${breakerAmp} პატარაა!`);
+            statusClass = "warning";
+            hasErrors = true;
+        }
+        
+        if(!breakerProtectsCable){
+            recommendations.push(`⚠️ ავტომატი ${breakerAmp}A > კაბელის ${cableMaxCurrent}A - კაბელი იწვის!`);
+            statusClass = "warning";
+            hasErrors = true;
+        }
+        
+        if(!voltageDropSafe){
+            recommendations.push(`⚠️ ძაბვის ვარდნა ${percent}% > 3% (PUE სტანდარტი)`);
+            statusClass = "warning";
+        }
+        
+        if(recommendations.length === 0){
+            recommendations.push("✅ ყველაფერი სწორია! PUE სტანდარტს შეესაბამება.");
+        }
+        
+        totalCable += L;
+        totalBreaker += 1;
+
+        resultsHTML += `
+            <div class="result-item">
+                <h4>სეგმენტი ${i+1} - ${purposeText(purpose)}</h4>
+                <table style="width:100%; font-size:13px; margin:10px 0;">
+                    <tr><td>დენი I:</td><td><b>${I} A</b></td></tr>
+                    <tr><td>ავტომატი:</td><td><b>${breakerType}${breakerAmp}A</b></td></tr>
+                    <tr><td>კაბელი:</td><td><b>${cableSize}mm²</b> (მაქს: ${cableMaxCurrent}A)</td></tr>
+                    <tr><td>ძაბვის ვარდნა:</td><td><b class="${percent>3?'warning':'success'}">${deltaU.toFixed(2)}V (${percent}%)</b></td></tr>
+                    <tr><td>გათბობა:</td><td><b>${Pheat.toFixed(2)} W</b></td></tr>
+                    <tr><td>სიგრძე:</td><td><b>${L} მ</b></td></tr>
+                </table>
+                <div class="${statusClass}" style="padding:10px; background:${statusClass==='success'?'#d4edda':'#f8d7da'}; border-radius:6px; margin-top:8px;">
+                    ${recommendations.join('<br>')}
+                </div>
+            </div>
+        `;
+
+        chartLabels.push(`Seg ${i+1}`);
+        chartData.push(percent);
+        colors.push(percent <= 3 ? "#27ae60" : "#e74c3c");
+    });
+
+    if(hasErrors){
+        resultsHTML += `<div class="danger-box">
+            <strong>🔴 ყურადღება!</strong> აღმოჩენილია შეცდომები. გთხოვთ, გაასწოროთ სქემა უსაფრთხოებისთვის!
+        </div>`;
+    }
+
+    resultsHTML += `
+        <div style="margin-top:20px; padding:15px; background:#e8f4f8; border-radius:8px;">
+            <strong>📦 ჯამური მონაცემები:</strong><br>
+            სულ კაბელი: <b>${totalCable} მ</b><br>
+            სულ ავტომატები: <b>${totalBreaker} ცალი</b>
+        </div>
+    `;
+    
+    document.getElementById("result").innerHTML = resultsHTML;
+    drawChart(chartLabels, chartData, colors);
+}
+
+function purposeText(p){
+    const map = {
+        'lighting': 'განათება',
+        'socket': 'როზეტები',
+        'conditioner': 'კონდიციონერი',
+        'heater': 'გამათბობელი',
+        'kitchen': 'სამზარეულო',
+        'welding': 'სვარკა/კომპრესორი',
+        'other': 'სხვა'
+    };
+    return map[p] || p;
+}
+
+function drawChart(labels, data, colors){
+    const canvas = document.getElementById("chart");
+    const ctx = canvas.getContext("2d");
+    const tooltip = document.getElementById("tooltip");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    const padding = 70;
+    const chartWidth = canvas.width - padding*2;
+    const chartHeight = canvas.height - padding*2;
+    const maxPercent = Math.max(...data, 5) * 1.2;
+
+    ctx.fillStyle = "#fafafa";
+    ctx.fillRect(padding, padding, chartWidth, chartHeight);
+
+    ctx.beginPath();
+    ctx.moveTo(padding, padding);
+    ctx.lineTo(padding, canvas.height-padding);
+    ctx.lineTo(canvas.width-padding, canvas.height-padding);
+    ctx.strokeStyle="#2c3e50";
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    ctx.fillStyle="#2c3e50";
+    ctx.textAlign="right";
+    ctx.font="12px Arial";
+    for(let y=0; y<=maxPercent; y+=1){
+        const yPos = canvas.height-padding - (y/maxPercent)*chartHeight;
+        if(y%1 === 0){
+            ctx.fillText(y+"%", padding-10, yPos+4);
+            ctx.beginPath();
+            ctx.moveTo(padding, yPos);
+            ctx.lineTo(canvas.width-padding, yPos);
+            ctx.strokeStyle=y===3?"#e74c3c":"#ecf0f1";
+            ctx.lineWidth=y===3?2:1;
+            ctx.stroke();
+        }
+    }
+
+    ctx.fillStyle="#e74c3c";
+    ctx.font="bold 11px Arial";
+    ctx.fillText("PUE ზღვარი 3%", canvas.width-padding-80, canvas.height-padding-(3/maxPercent)*chartHeight-8);
+
+    ctx.textAlign="center";
+    labels.forEach((label,i)=>{
+        const x = padding + (i+0.5)*(chartWidth/labels.length);
+        ctx.fillStyle="#2c3e50";
+        ctx.fillText(label, x, canvas.height-padding+20);
+    });
+
+    const barWidth = chartWidth/labels.length * 0.6;
+    const points = [];
+    
+    data.forEach((percent,i)=>{
+        const x = padding + (i+0.5)*(chartWidth/labels.length);
+        const barHeight = (percent/maxPercent)*chartHeight;
+        const y = canvas.height-padding-barHeight;
+        
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(x-barWidth/2, y, barWidth, barHeight);
+        
+        ctx.fillStyle="#2c3e50";
+        ctx.font="bold 12px Arial";
+        ctx.fillText(percent+"%", x, y-8);
+        
+        points.push({x,y:canvas.height-padding-barHeight/2,val:percent,i,barHeight});
+    });
+
+    canvas.onmousemove = function(e){
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        let found = false;
+        
+        points.forEach(pt=>{
+            if(Math.abs(mouseX-pt.x) < barWidth/2 && mouseY > canvas.height-padding-pt.barHeight && mouseY < canvas.height-padding){
+                const seg = segments[pt.i];
+                tooltip.style.display="block";
+                tooltip.style.left = (e.clientX+15)+"px";
+                tooltip.style.top = (e.clientY+15)+"px";
+                
+                const P = seg.querySelector(".power").value;
+                const cable = seg.querySelector(".cableSize").value;
+                const breaker = seg.querySelector(".breakerAmp").value;
+                
+                tooltip.innerHTML = `
+                    <strong>სეგმენტი ${pt.i+1}</strong><br>
+                    სიმძლავრე: ${P} W<br>
+                    ძაბვის ვარდნა: <span style="color:${pt.val>3?'#ff6b6b':'#51cf66'}">${pt.val}%</span><br>
+                    კაბელი: ${cable}mm²<br>
+                    ავტომატი: B${breaker}A<br>
+                    ${pt.val>3?'⚠️ PUE ზღვარზე მეტი!':'✅ ნორმაშია'}
+                `;
+                found = true;
+            }
+        });
+        
+        if(!found) tooltip.style.display="none";
+    };
+    
+    canvas.onmouseleave = function(){ tooltip.style.display="none"; };
+}
+
+addSegment();
+</script>
+</body>
+</html>

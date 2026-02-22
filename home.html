@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ელექტრიკოსის კალკულატორი</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <h1 id="title">⚡ ელექტრიკოსის კალკულატორი</h1>
+<button onclick="window.location.href='../index.html'">უკან დაბრუნება</button>
+
+</header>
+
+<div class="container">
+
+  <!-- ვატები -->
+  <h2 id="wattTitle">ვატების გამოთვლა</h2>
+  <input id="u1" placeholder="ძაბვა (V)" />
+  <input id="i1" placeholder="ამპერი (A)" />
+  <button onclick="calcWatt()">გამოთვლა</button>
+  <div class="result" id="wattRes"></div>
+
+  <!-- ამპერები -->
+  <h2 id="ampTitle">ამპერების გამოთვლა</h2>
+  <input id="u2" placeholder="ძაბვა (V)" />
+  <input id="p2" placeholder="სიმძლავრე (W)" />
+  <button onclick="calcAmp()">გამოთვლა</button>
+  <div class="result" id="ampRes"></div>
+
+  <!-- კაბელი + ავტომატი -->
+  <h2 id="cableTitle">კაბელი და ავტომატი</h2>
+  <input id="load" placeholder="დატვირთვა (W)" />
+  <button onclick="calcCable()">გამოთვლა</button>
+  <div id="cableRes"></div>
+
+  <div class="result-images">
+    <img id="cableImg" style="display:none;">
+    <img id="breakerImg" style="display:none;">
+  </div>
+
+ 
+
+  <!-- წინაღობა + ვარდნა -->
+  <h2 id="dropTitle">წინაღობა და ძაბვის ვარდნა</h2>
+  <input id="length" placeholder="სიგრძე (მ)" />
+  <input id="section" placeholder="კვეთა (mm²)" />
+  <input id="current" placeholder="ამპერი (A)" />
+  <input id="voltage" placeholder="ძაბვა (V)" />
+
+  <select id="materialDrop">
+    <option value="0.0175">სპილენძი</option>
+    <option value="0.028">ალუმინი</option>
+  </select>
+
+  <button onclick="calcDrop()">გამოთვლა</button>
+  <div class="result" id="dropRes"></div>
+
+   <!-- კაბელის კვეთა -->
+  <h2>კაბელის კვეთის გამოთვლა (სიგრძით)</h2>
+  <input id="powerNew" placeholder="სიმძლავრე (W)">
+  <input id="lengthNew" placeholder="სიგრძე (მ)">
+  
+  <select id="materialSection">
+    <option value="copper">სპილენძი</option>
+    <option value="aluminum">ალუმინი</option>
+  </select>
+
+  <select id="voltageType">
+    <option value="220">220V (ერთფაზა)</option>
+    <option value="380">380V (სამფაზა)</option>
+  </select>
+
+  <button onclick="calcSection()">გამოთვლა</button>
+  <div class="result" id="sectionRes"></div>
+
+  <!-- კაბელის კვეთის ცხრილი -->
+<div class="section">
+  <h2>კაბელის მაქსიმალური სიგრძე (ცხრილი)</h2>
+
+  <input id="powerTable" placeholder="სიმძლავრე (W)">
+  <select id="phaseTable">
+    <option value="220">220V (ერთფაზა)</option>
+    <option value="380">380V (სამფაზა)</option>
+  </select>
+
+  <select id="materialTable">
+    <option value="copper">სპილენძი</option>
+    <option value="aluminum">ალუმინი</option>
+  </select>
+
+  <select id="dropPercent">
+    <option value="3">3% (განათება)</option>
+    <option value="5" selected>5% (როზეტი)</option>
+  </select>
+
+  <button onclick="generateTable()">გამოთვლა</button>
+
+  <div id="tableResult" style="margin-top:15px;"></div>
+</div>
+
+
+
+
+
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
