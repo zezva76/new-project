@@ -80,28 +80,44 @@ function calcSection() {
 }
 
 function calcDrop() {
-  let L = Number(document.getElementById("length").value);
-  let S = Number(document.getElementById("section").value);
-  let I = Number(document.getElementById("current").value);
-  let U = Number(document.getElementById("voltage").value);
-  let rho = Number(document.getElementById("materialDrop").value);
+  let L = Number(document.getElementById("length").value); // სიგრძე მეტრებში
+  let S = Number(document.getElementById("section").value); // კვეთა mm²
+  let I = Number(document.getElementById("current").value); // ამპერი
+  let U = Number(document.getElementById("voltage").value); // ძაბვა
+  let rho = Number(document.getElementById("materialDrop").value); // ρ სპილენძი ან ალუმინი
 
-  if (!L || !S || !I || !U) return;
+  if (!L || !S || !I || !U) {
+    document.getElementById("dropRes").innerHTML = "გთხოვ შეავსე ყველა ველი";
+    return;
+  }
 
+  // წინააღმდეგობა
   let R = (rho * (2 * L)) / S;
+
+  // ძაბვის ვარდნა ვოლტებში
   let dU = I * R;
+
+  // ძაბვის ვარდნა პროცენტში
   let dU_percent = (dU / U) * 100;
-  let U_load = U - dU;
+
+  // სტატუსი ფერის მიხედვით
+  let status = "";
+  if (dU_percent <= 3) {
+    status = "✅ უსაფრთხო (მწვანე)";
+  } else if (dU_percent <= 5) {
+    status = "⚠ ყურადღება (ყვითელი)";
+  } else {
+    status = "❌ არასასურველი (წითელი)";
+  }
+
+  // დაკარგული სიმძლავრე
   let P_loss = I * I * R;
 
-  let status = dU_percent > 5 ? text[lang].warning : text[lang].good;
-
   document.getElementById("dropRes").innerHTML =
-    "R: " + R.toFixed(4) + " Ω<br>" +
-    "ΔU: " + dU.toFixed(2) + " V<br>" +
-    "ΔU %: " + dU_percent.toFixed(2) + " % " + status + "<br>" +
-    "Load Voltage: " + U_load.toFixed(2) + " V<br>" +
-    "Loss: " + P_loss.toFixed(2) + " W";
+    `ძაბვის ვარდნა: <b>${dU.toFixed(2)} V</b> (${dU_percent.toFixed(2)}%)<br>` +
+    `სტატუსი: <b>${status}</b><br>` +
+    `დატვირთვის ძაბვა: ${ (U - dU).toFixed(2) } V<br>` +
+    `კალორიული დაკარგვა: ${P_loss.toFixed(2)} W`;
 }
 
 function generateTable() {
